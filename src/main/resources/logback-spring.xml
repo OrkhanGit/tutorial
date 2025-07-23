@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+<!--    Hansi muhitde chalishacaqsa onu qeyd edir-->
+    <springProfile name="dev">
+
+        <!-- Konsola adi formatda log yazan appender -->
+        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            </encoder>
+        </appender>
+
+        <!-- Fayla JSON formatında log yazan appender -->
+        <appender name="JSON_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>/Users/orkhanmammadov/Desktop/log/app-json-log.log</file>
+
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <!-- Hər gün yeni fayl -->
+                <fileNamePattern>/Users/orkhanmammadov/Desktop/log/app-json-log-%d{yyyy-MM-dd}.log</fileNamePattern>
+                <!-- 30 günlük tarixçəni saxla -->
+                <maxHistory>30</maxHistory>
+            </rollingPolicy>
+
+            <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+                <!-- İstəyə görə əlavə sahə -->
+                <customFields>{"application":"my-spring-app"}</customFields>
+            </encoder>
+        </appender>
+
+        <!-- Root logger – hər iki appenderə göndər -->
+        <root level="INFO,ERROR">
+            <appender-ref ref="CONSOLE" />
+            <appender-ref ref="JSON_FILE" />
+        </root>
+
+    </springProfile>
+
+</configuration>
