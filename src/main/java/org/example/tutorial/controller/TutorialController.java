@@ -47,7 +47,7 @@ public class TutorialController {
         return tutorialService.updateTutorial(id,tutorial);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/id/{id}")
     public ResponseEntity<String> deleteTutorial(@PathVariable long id) {
         return tutorialService.deleteTutorial(id);
     }
@@ -60,6 +60,11 @@ public class TutorialController {
     @GetMapping("/info")
     public void info(HttpServletRequest request){
         tutorialService.getInfo(request);
+    }
+
+    @DeleteMapping("/title/{title}")
+    public ResponseEntity<String> deleteTutorialByTitle(@PathVariable String title) {
+        return tutorialService.deleteTutorialByTitle(title);
     }
 
 

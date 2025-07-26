@@ -2,6 +2,7 @@ package org.example.tutorial.repository;
 
 import lombok.RequiredArgsConstructor;
 import org.example.tutorial.model.Tutorial;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -28,23 +29,38 @@ public class TutorialRepositoryJDBC implements TutorialRepository {
 
     @Override
     public Tutorial findByTitle(String title) {
-        return jdbcTemplate.queryForObject("SELECT * FROM tutorial WHERE title=?",
-                new BeanPropertyRowMapper<>(Tutorial.class),
-                title);
+        try{
+            return jdbcTemplate.queryForObject("SELECT * FROM tutorial WHERE title=?",
+                    new BeanPropertyRowMapper<>(Tutorial.class),
+                    title);
+        }catch (EmptyResultDataAccessException e){
+            return null;
+        }
+
     }
 
     @Override
     public Tutorial findById(Long id) {
-        return jdbcTemplate.queryForObject("SELECT * FROM tutorial WHERE id = ?",
-                new BeanPropertyRowMapper<>(Tutorial.class),
-                id);
+        try{
+            return jdbcTemplate.queryForObject("SELECT * FROM tutorial WHERE id = ?",
+                    new BeanPropertyRowMapper<>(Tutorial.class),
+                    id);
+        }catch (EmptyResultDataAccessException e){
+            return null;
+        }
+
     }
 
     @Override
     public List<Tutorial> findByPublished(boolean published) {
-        return jdbcTemplate.query("SELECT * FROM tutorial WHERE published = ?",
-                new BeanPropertyRowMapper<>(Tutorial.class),
-                published);
+        try{
+            return jdbcTemplate.query("SELECT * FROM tutorial WHERE published = ?",
+                    new BeanPropertyRowMapper<>(Tutorial.class),
+                    published);
+        }catch (EmptyResultDataAccessException e){
+            return null;
+        }
+
     }
 
     @Override
@@ -62,5 +78,10 @@ public class TutorialRepositoryJDBC implements TutorialRepository {
     @Override
     public void deleteAll() {
         jdbcTemplate.update("DELETE FROM tutorial");
+    }
+
+    @Override
+    public void deleteByTitle(String title) {
+        jdbcTemplate.update("DELETE FROM tutorial WHERE title = ?",title);
     }
 }
