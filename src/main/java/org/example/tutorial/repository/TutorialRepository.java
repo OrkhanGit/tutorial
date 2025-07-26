@@ -14,6 +14,7 @@ public interface TutorialRepository {
     void delete(Long id);
     void deleteAll();
     Tutorial findByTitle(String title);
+    void deleteByTitle(String title);
 
 
 }

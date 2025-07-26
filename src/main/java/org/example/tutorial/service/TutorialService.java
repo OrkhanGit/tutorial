@@ -3,9 +3,12 @@ package org.example.tutorial.service;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.tutorial.exception.NotFoundId;
+import org.example.tutorial.exception.NotFoundList;
+import org.example.tutorial.exception.NotFoundPublished;
+import org.example.tutorial.exception.NotFoundTitle;
 import org.example.tutorial.model.Tutorial;
 import org.example.tutorial.repository.TutorialRepository;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -21,139 +24,106 @@ public class TutorialService {
 
 
     public ResponseEntity<String> createdTutorial(Tutorial tutorial) {
-        try{
-            tutorial.setPublished(false);
-            String cleanedTitle = tutorial.getTitle().replaceAll("\\s+", "").toLowerCase();
-            tutorial.setTitle(cleanedTitle);
-            tutorialRepository.save(tutorial);
-            return ResponseEntity.status(HttpStatus.CREATED).body("Tutorial created successfully.");
-        } catch (Exception e) {
-            log.error("Tutorial creation failed.");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Tutorial creation failed.");
+        String cleanedTitle = tutorial.getTitle().replaceAll("\\s+", "").toLowerCase();
+        Tutorial founded = tutorialRepository.findByTitle(cleanedTitle);
+        if (founded != null) {
+            if (cleanedTitle.equals(founded.getTitle())) {
+                log.info("Tutorial title already exists");
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("\"" + cleanedTitle + "\"" + " already exists");
+            }
         }
+        tutorial.setPublished(false);
+        tutorial.setTitle(cleanedTitle);
+        tutorialRepository.save(tutorial);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Tutorial created successfully.");
     }
 
     public ResponseEntity<List<Tutorial>> getAllTutorial() {
-        try{
-            List<Tutorial> founded = tutorialRepository.findAll();
-            if(founded.isEmpty()) {
-                log.info("Tutorial list is empty.");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-            }
-            return ResponseEntity.ok(founded);
-        }catch (Exception e){
-            log.error("Internal server error.");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        List<Tutorial> founded = tutorialRepository.findAll();
+        if (founded.isEmpty()) {
+            log.info("Tutorial list is empty.");
+            throw new NotFoundList("not found list from db");
         }
+        return ResponseEntity.ok(founded);
     }
 
     public ResponseEntity<Tutorial> getTutorialById(Long id) {
-        try{
-            Tutorial founded = tutorialRepository.findById(id);
-            if(founded == null || id != founded.getId()) {
-                log.info("id not found.");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-            }
-            return ResponseEntity.ok(founded);
+        Tutorial founded = tutorialRepository.findById(id);
+        if(founded == null || id != founded.getId()) {
+            log.info("id not found.");
+            throw new NotFoundId("not found id from db");
         }
-        catch (EmptyResultDataAccessException e){
-            log.error("Not found id");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }catch (Exception e){
-            log.error("Internal server error.");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-
-    }
-
-    public ResponseEntity<List<Tutorial>> getTutorialByPublished(boolean published) {
-        try{
-            List<Tutorial> founded = tutorialRepository.findByPublished(published);
-            if(founded.isEmpty()) {
-                log.info("not found published");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-            }
-            return ResponseEntity.status(HttpStatus.OK).body(founded);
-        }catch (EmptyResultDataAccessException e){
-            log.error("Not found Tutorial with published");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }catch (Exception e){
-            log.error("Internal server error.");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-
-    }
-
-    public ResponseEntity<String> updateTutorial(long id, Tutorial tutorial) {
-        try{
-            Tutorial founded = tutorialRepository.findById(id);
-            if(founded == null || founded.getId() != id) {
-                log.info("id not found.");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-            }
-            founded.setId(id);
-            founded.setTitle(tutorial.getTitle().toLowerCase());
-            founded.setDescription(tutorial.getDescription());
-            founded.setPublished(tutorial.getPublished());
-            tutorialRepository.update(founded);
-            return ResponseEntity.status(HttpStatus.OK).body("Tutorial updated successfully.");
-        }catch (EmptyResultDataAccessException e){
-            log.error("Not found id");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Tutorial not found.");
-        }catch (Exception e){
-            log.error("Internal server error.");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Tutorial update failed.");
-        }
-    }
-
-    public ResponseEntity<String> deleteTutorial(long id) {
-        try {
-            Tutorial founded = tutorialRepository.findById(id);
-            if(founded == null || id != founded.getId()) {
-                log.info("id not found.");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Tutorial not found.");
-            }
-            tutorialRepository.delete(id);
-            return ResponseEntity.status(HttpStatus.OK).body(founded.getTitle() + " Deleted successfully.");
-        }catch (EmptyResultDataAccessException e){
-            log.error("Not found id in Tutorial DB");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Tutorial not found.");
-        }catch (Exception e){
-            log.error("Internal server error.");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Tutorial deletion failed.");
-        }
-
-    }
-
-    public ResponseEntity<String> deleteAllTutorials() {
-        try {
-            tutorialRepository.deleteAll();
-            return ResponseEntity.status(HttpStatus.OK).body("All tutorial deleted successfully.");
-        }catch (Exception e){
-            log.error("Internal server error.");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Tutorial deletion failed.");
-        }
-
+        return ResponseEntity.ok(founded);
     }
 
     public ResponseEntity<Tutorial> findByTitle(String title) {
-        try {
-            Tutorial founded = tutorialRepository.findByTitle(title.toLowerCase());
-            if(founded == null || !title.equals(founded.getTitle())) {
-                log.info("title not found.");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-            }
-            return ResponseEntity.status(HttpStatus.OK).body(founded);
-        }catch (EmptyResultDataAccessException e){
-            log.error("Not found Tutorial with title {}.", title);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        String cleanTitle = title.replaceAll("\\s+", "").toLowerCase();
+        Tutorial founded = tutorialRepository.findByTitle(cleanTitle);
+        if(founded == null) {
+            log.info("title not found.");
+            throw new NotFoundTitle("not found title from db");
         }
-        catch (Exception e){
-            log.error("Internal server error.");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
-
+        return ResponseEntity.status(HttpStatus.OK).body(founded);
     }
+
+    public ResponseEntity<List<Tutorial>> getTutorialByPublished(boolean published) {
+        List<Tutorial> founded = tutorialRepository.findByPublished(published);
+        if(founded.isEmpty()) {
+            log.info("not found published");
+            throw new NotFoundPublished("not found published from db");
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(founded);
+    }
+
+    public ResponseEntity<String> updateTutorial(long id, Tutorial tutorial) {
+        Tutorial founded = tutorialRepository.findById(id);
+        if(founded == null) {
+            log.info("id not found.");
+            throw new NotFoundId("not found id from db");
+        }
+        Tutorial foundedTitle = tutorialRepository.findByTitle(tutorial.getTitle().replaceAll("\\s+", "").toLowerCase());
+        if (foundedTitle!=null) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Tutorial title already exists");
+        }
+        founded.setId(id);
+        founded.setTitle(tutorial.getTitle().replaceAll("\\s+", "").toLowerCase());
+        founded.setDescription(tutorial.getDescription());
+        founded.setPublished(tutorial.getPublished());
+        tutorialRepository.update(founded);
+        return ResponseEntity.status(HttpStatus.OK).body("Tutorial updated successfully.");
+    }
+
+    public ResponseEntity<String> deleteTutorial(long id) {
+        Tutorial founded = tutorialRepository.findById(id);
+        if(founded == null) {
+            log.info("id not found.");
+            throw new NotFoundId("not found id from db");
+        }
+        tutorialRepository.delete(id);
+        return ResponseEntity.status(HttpStatus.OK).body(founded.getTitle() + " Deleted successfully.");
+    }
+
+    public ResponseEntity<String> deleteTutorialByTitle(String title) {
+        String cleanTitle = title.replaceAll("\\s+", "").toLowerCase();
+        Tutorial founded = tutorialRepository.findByTitle(cleanTitle);
+        if(founded == null) {
+            log.info("title not found.");
+            throw new NotFoundTitle("not found title from db");
+        }
+        tutorialRepository.deleteByTitle(title);
+        return ResponseEntity.status(HttpStatus.OK).body(title + " deleted successfully.");
+    }
+
+    public ResponseEntity<String> deleteAllTutorials() {
+        List<Tutorial> founded = tutorialRepository.findAll();
+        if(founded.isEmpty()) {
+            log.info("Tutorial list is empty.");
+            throw new NotFoundList("not found list from db");
+        }
+        tutorialRepository.deleteAll();
+        return ResponseEntity.status(HttpStatus.OK).body("All tutorial deleted successfully.");
+    }
+
 
     public void getInfo( HttpServletRequest request) {
 
@@ -162,4 +132,5 @@ public class TutorialService {
         System.out.println(request.getQueryString());
 
     }
+
 }
