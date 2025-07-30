@@ -1,12 +1,13 @@
 package org.example.tutorial.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.example.tutorial.model.Tutorial;
 import org.example.tutorial.service.TutorialService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -57,14 +58,14 @@ public class TutorialController {
         return tutorialService.deleteAllTutorials();
     }
 
-    @GetMapping("/info")
-    public void info(HttpServletRequest request){
-        tutorialService.getInfo(request);
-    }
-
     @DeleteMapping("/title/{title}")
     public ResponseEntity<String> deleteTutorialByTitle(@PathVariable String title) {
         return tutorialService.deleteTutorialByTitle(title);
+    }
+
+    @PostMapping("/upload")
+    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
+        return tutorialService.uploadFile(file);
     }
 
 
