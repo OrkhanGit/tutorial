@@ -30,9 +30,9 @@ public class TutorialRepositoryJDBC implements TutorialRepository {
     @Override
     public Tutorial findByTitle(String title) {
         try{
-            return jdbcTemplate.queryForObject("SELECT * FROM tutorial WHERE title=?",
+            return jdbcTemplate.queryForObject("SELECT * FROM tutorial WHERE REPLACE(LOWER(title),' ','') = ?",
                     new BeanPropertyRowMapper<>(Tutorial.class),
-                    title);
+                    title.replaceAll("\\s+","").toLowerCase());
         }catch (EmptyResultDataAccessException e){
             return null;
         }

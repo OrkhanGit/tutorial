@@ -30,6 +30,7 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:1.5.18") // for write to File
     implementation 'net.logstash.logback:logstash-logback-encoder:8.1' // for convert to JSON
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0' // for SWAGGER
+    implementation("io.minio:minio:8.5.17") //minIO
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'org.postgresql:postgresql'
     annotationProcessor 'org.projectlombok:lombok'
