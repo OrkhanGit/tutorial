@@ -15,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -24,8 +25,9 @@ public class TutorialServiceImpl implements TutorialService {
     private final TutorialRepository tutorialRepository;
 
     public ResponseEntity<String> createdTutorial(Tutorial tutorial) {
-        Tutorial found = tutorialRepository.findByTitle(tutorial.getTitle());
-        if (found != null) {
+        String cleanTitle = tutorial.getTitle().replaceAll("\\s+","").toLowerCase();
+        Optional<Tutorial> found = tutorialRepository.findByTitle(cleanTitle);
+        if (found.isPresent()) {
             log.info("Tutorial title already exists");
             return ResponseEntity.status(HttpStatus.CONFLICT).body("\"" + tutorial.getTitle() + "\"" + " already exists");
         }
@@ -46,21 +48,16 @@ public class TutorialServiceImpl implements TutorialService {
     }
 
     public ResponseEntity<Tutorial> getTutorialById(Long id) {
-        Tutorial found = tutorialRepository.findById(id);
-        if(found == null || id != found.getId()) {
-            log.info("id not found.");
-            throw new NotFound("not found id from db");
-        }
+        Tutorial found = tutorialRepository.findById(id)
+                .orElseThrow(()-> new NotFound("not found id from db"));
         log.info("found id");
         return ResponseEntity.ok(found);
     }
 
     public ResponseEntity<Tutorial> findByTitle(String title) {
-        Tutorial found = tutorialRepository.findByTitle(title);
-        if(found == null) {
-            log.info("title not found.");
-            throw new NotFound("not found title from db");
-        }
+        String cleanTitle = title.replaceAll("\\s+","").toLowerCase();
+        Tutorial found = tutorialRepository.findByTitle(cleanTitle)
+                .orElseThrow(()-> new NotFound("not found title from db"));
         log.info("found title");
         return ResponseEntity.status(HttpStatus.OK).body(found);
     }
@@ -76,43 +73,35 @@ public class TutorialServiceImpl implements TutorialService {
     }
 
     public ResponseEntity<String> updateTutorial(long id, Tutorial tutorial) {
-        Tutorial found = tutorialRepository.findById(id);
-        if(found == null) {
-            log.info("id not found.");
-            throw new NotFound("not found id from db");
-        }
-        Tutorial foundTitle = tutorialRepository.findByTitle(tutorial.getTitle());
-        if (foundTitle!=null) {
-            log.info("title already exists");
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("title already exists");
+        Tutorial found = tutorialRepository.findById(id)
+                .orElseThrow(()-> new NotFound("not found id from db"));
+        Optional<Tutorial> existing = tutorialRepository.findByTitleAndIdNot(tutorial.getTitle(), id);
+        if (existing.isPresent()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body("Another tutorial with the same title already exists.");
         }
         found.setId(id);
         found.setTitle(tutorial.getTitle());
         found.setDescription(tutorial.getDescription());
         found.setPublished(tutorial.getPublished());
-        tutorialRepository.update(found);
+        tutorialRepository.save(found);
         log.info("Tutorial updated successfully.");
         return ResponseEntity.status(HttpStatus.OK).body("Tutorial updated successfully.");
     }
 
     public ResponseEntity<String> deleteTutorial(long id) {
-        Tutorial found = tutorialRepository.findById(id);
-        if(found == null) {
-            log.info("id not found.");
-            throw new NotFound("not found id from db");
-        }
-        tutorialRepository.delete(id);
+        Tutorial found = tutorialRepository.findById(id)
+                .orElseThrow(()-> new NotFound("not found id from db"));
+        tutorialRepository.deleteById(id);
         log.info("deleted successfully.");
         return ResponseEntity.status(HttpStatus.OK).body(found.getTitle() + " Deleted successfully.");
     }
 
     public ResponseEntity<String> deleteTutorialByTitle(String title) {
-        Tutorial found = tutorialRepository.findByTitle(title);
-        if(found == null) {
-            log.info("title not found.");
-            throw new NotFound("not found title from db");
-        }
-        tutorialRepository.deleteByTitle(found.getTitle());
+        String cleanTitle = title.replaceAll("\\s+","").toLowerCase();
+        Tutorial found = tutorialRepository.findByTitle(cleanTitle)
+                .orElseThrow(()-> new NotFound("not found title from db"));
+        tutorialRepository.deleteById(found.getId());
         log.info("deleted successfully.");
         return ResponseEntity.status(HttpStatus.OK).body(title + " deleted successfully.");
     }

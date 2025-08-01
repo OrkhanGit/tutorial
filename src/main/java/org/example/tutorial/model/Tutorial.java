@@ -1,9 +1,13 @@
 package org.example.tutorial.model;
 
 import jakarta.persistence.*;
+import jdk.jfr.Timestamp;
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Value;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.LocalDateTime;
+import java.util.Date;
 
 @Entity
 @Data
@@ -24,6 +28,11 @@ public class Tutorial {
     @Column(name = "published")
     private Boolean published;
 
+    @Column(name="created_at")
+    @CreationTimestamp
+    private LocalDateTime createdAt;
 
-
+    @Column(name="updated_at")
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
 }
