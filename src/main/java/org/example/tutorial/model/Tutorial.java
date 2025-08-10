@@ -1,19 +1,27 @@
 package org.example.tutorial.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
 @Table(name = "tutorial")
+@NamedEntityGraph(name = "tutorialWithAll",
+attributeNodes = {
+        @NamedAttributeNode("tutorialDetails"),
+        @NamedAttributeNode("textbook"),
+        @NamedAttributeNode("uploadFileName")
+})
 public class Tutorial {
 
     @Id
@@ -45,7 +53,7 @@ public class Tutorial {
     @JsonManagedReference
     @JsonProperty("textBook")
     @ToString.Exclude
-    private List<Textbook> textbook;
+    private Set<Textbook> textbook;
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
@@ -55,6 +63,6 @@ public class Tutorial {
     )
     @JsonProperty("uploadFileName")
     @ToString.Exclude
-    private List<UploadFileName> uploadFileName;
+    private Set<UploadFileName> uploadFileName;
 
 }
