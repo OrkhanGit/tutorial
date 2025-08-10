@@ -21,19 +21,22 @@ configurations {
 
 repositories {
     mavenCentral()
+//    maven { url "https://repo.spring.io/release" }
 }
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation("org.slf4j:slf4j-api:2.0.17")
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
     implementation("ch.qos.logback:logback-classic:1.5.18") // for write to File
     implementation 'net.logstash.logback:logstash-logback-encoder:8.1' // for convert to JSON
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0' // for SWAGGER
     implementation("io.minio:minio:8.5.17") //minIO
-    compileOnly 'org.projectlombok:lombok'
+    implementation 'org.mapstruct:mapstruct:1.5.3.Final'
     runtimeOnly 'org.postgresql:postgresql'
-    annotationProcessor 'org.projectlombok:lombok'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }

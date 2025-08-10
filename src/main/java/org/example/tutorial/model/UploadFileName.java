@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
@@ -28,7 +29,6 @@ public class UploadFileName {
     private LocalDateTime uploadTime;
 
     @ManyToMany(mappedBy = "uploadFileName")
-    @JsonIgnore
     private List<Tutorial> tutorial;
 
 }

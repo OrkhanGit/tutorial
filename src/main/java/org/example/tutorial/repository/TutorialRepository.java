@@ -1,6 +1,7 @@
 package org.example.tutorial.repository;
 
 import org.example.tutorial.model.Tutorial;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -15,5 +16,16 @@ public interface TutorialRepository extends JpaRepository<Tutorial, Long> {
     Optional<Tutorial> findByTitle(String title);
     List<Tutorial> findByPublished(boolean published);
     Optional<Tutorial> findByTitleAndIdNot(String title, Long id);
+
+    @EntityGraph(attributePaths = {
+            "textbook","tutorialDetails","uploadFileName"
+    })
+    List<Tutorial> findAll();
+
+/**
+ * bunuda istifade elemek olar EntityGraph kimi. bu method seviyyesindedir.
+ * **/
+//        @EntityGraph(value = "tutorialWithAll")
+//    List<Tutorial> findAll();
 
 }

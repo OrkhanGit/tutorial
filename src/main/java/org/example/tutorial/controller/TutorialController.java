@@ -1,6 +1,7 @@
 package org.example.tutorial.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.example.tutorial.dto.TutorialDto;
 import org.example.tutorial.model.Tutorial;
 import org.example.tutorial.service.TutorialService;
 import org.springframework.http.ResponseEntity;
@@ -23,9 +24,14 @@ public class TutorialController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<Tutorial>>  getAllTutorials() {
-        return tutorialService.getAllTutorial();
+    public ResponseEntity<List<TutorialDto>>  getAllTutorialsDto() {
+        return tutorialService.getAllTutorialsDto();
     }
+
+//    @GetMapping("/all")
+//    public ResponseEntity<List<Tutorial>>  getAllTutorials() {
+//        return tutorialService.getAllTutorials();
+//    }
 
 
     @GetMapping("/id/{id}")

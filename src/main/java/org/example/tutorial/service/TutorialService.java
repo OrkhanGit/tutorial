@@ -1,5 +1,6 @@
 package org.example.tutorial.service;
 
+import org.example.tutorial.dto.TutorialDto;
 import org.example.tutorial.model.Tutorial;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
@@ -10,7 +11,8 @@ import java.util.List;
 public interface TutorialService {
 
     ResponseEntity<String> createdTutorial(Tutorial tutorial);
-    ResponseEntity<List<Tutorial>> getAllTutorial();
+    ResponseEntity<List<TutorialDto>> getAllTutorialsDto();
+//    ResponseEntity<List<Tutorial>> getAllTutorials();
     ResponseEntity<Tutorial> getTutorialById(Long id);
     ResponseEntity<Tutorial> findByTitle(String title);
     ResponseEntity<List<Tutorial>> getTutorialByPublished(boolean published);

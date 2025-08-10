@@ -1,8 +1,12 @@
 package org.example.tutorial.service;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.tutorial.dto.TutorialDto;
 import org.example.tutorial.exception.NotFound;
+import org.example.tutorial.mapper.MapperTutorial;
 import org.example.tutorial.model.Textbook;
 import org.example.tutorial.model.Tutorial;
 import org.example.tutorial.model.UploadFileName;
@@ -18,9 +22,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +34,10 @@ public class TutorialServiceImpl implements TutorialService {
 
     private final TutorialRepository tutorialRepository;
     private final UploadFileNameRepository uploadFileNameRepository;
+    private final MapperTutorial mapperTutorial;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     public ResponseEntity<String> createdTutorial(Tutorial tutorial) {
         String cleanTitle = tutorial.getTitle().replaceAll("\\s+","").toLowerCase();
@@ -37,14 +46,21 @@ public class TutorialServiceImpl implements TutorialService {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("\"" + tutorial.getTitle() + "\"" + " already exists");
         }
         tutorial.setPublished(false);
+
+        Set<UploadFileName> collect = tutorial.getUploadFileName().stream()
+                .map(file -> entityManager.find(UploadFileName.class, file.getId()))
+                .collect(Collectors.toSet());
+
+        tutorial.setUploadFileName(collect);
         tutorialRepository.save(tutorial);
         return ResponseEntity.status(HttpStatus.CREATED).body("Tutorial created successfully.");
     }
 
-    public ResponseEntity<List<Tutorial>> getAllTutorial() {
-        List<Tutorial> found = tutorialRepository.findAll();
-        if (found.isEmpty()) {
-        }
+    public ResponseEntity<List<TutorialDto>> getAllTutorialsDto() {
+        List<TutorialDto> found = tutorialRepository.findAll()
+                .stream()
+                .map(tutorial -> mapperTutorial.toDto(tutorial))
+                .toList();
         return ResponseEntity.ok(found);
     }
 
@@ -85,6 +101,7 @@ public class TutorialServiceImpl implements TutorialService {
         found.getTutorialDetails().setPrerequisites(tutorial.getTutorialDetails().getPrerequisites());
         found.getTutorialDetails().setDifficultyLevel(tutorial.getTutorialDetails().getDifficultyLevel());
         found.setUpdatedAt(LocalDateTime.now());
+
         found.getTextbook().clear();
         if(tutorial.getTextbook() != null){
             for(Textbook textbook : tutorial.getTextbook()){
@@ -92,12 +109,13 @@ public class TutorialServiceImpl implements TutorialService {
                 found.getTextbook().add(textbook);
             }
         }
+
         found.getUploadFileName().clear();
         if(tutorial.getUploadFileName() != null){
             UploadFileName uploadFileNameEntity;
             for(UploadFileName uploadFileName : tutorial.getUploadFileName()){
                 if(uploadFileName.getId() != null){
-                    uploadFileNameEntity = uploadFileNameRepository.findById(uploadFileName.getId()).orElseThrow(()-> new NotFound("not found id from db"));
+                    uploadFileNameEntity = uploadFileNameRepository.findById(uploadFileName.getId()).orElseThrow(()-> new NotFound("not found file from db"));
                 }else {
                     uploadFileNameEntity =uploadFileName;
                 }
