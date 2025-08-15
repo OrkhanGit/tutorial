@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.ToString;
 
 @Entity
-@Table(name = "tutorialDetails")
+@Table(name = "tutorial_details")
 @Data
 public class TutorialDetails {
 
@@ -15,7 +15,7 @@ public class TutorialDetails {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "difficultyLevel")
+    @Column(name = "difficulty_level")
     private String difficultyLevel;
 
     @Column(name = "prerequisites")
@@ -23,8 +23,8 @@ public class TutorialDetails {
 
     @OneToOne
     @JoinColumn(name = "tutorial_id")
-    @JsonBackReference
     @ToString.Exclude
+    @JsonBackReference
     private Tutorial tutorial;
 
 }

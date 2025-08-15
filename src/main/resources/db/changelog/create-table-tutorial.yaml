@@ -1,0 +1,35 @@
+databaseChangeLog:
+  - changeSet:
+      author: orkhan
+      id: create_table_tutorial
+      context: dev
+      changes:
+        - createTable:
+            schemaName: public
+            tableName: tutorial
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: title
+                  type: VARCHAR
+              - column:
+                  name: description
+                  type: VARCHAR
+              - column:
+                  name: published
+                  type: boolean
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+              - column:
+                  name: password
+                  type: VARCHAR
