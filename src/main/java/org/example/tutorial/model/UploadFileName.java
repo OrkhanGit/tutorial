@@ -13,7 +13,7 @@ import java.util.List;
 
 @Entity
 @Data
-@Table(name = "uploadFileName")
+@Table(name = "upload_file_name")
 public class UploadFileName {
 
     @Id
@@ -21,14 +21,15 @@ public class UploadFileName {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "fileName")
+    @Column(name = "file_name")
     private String fileName;
 
     @CreationTimestamp
-    @Column(name = "uploadTime")
+    @Column(name = "upload_time")
     private LocalDateTime uploadTime;
 
     @ManyToMany(mappedBy = "uploadFileName")
+    @JsonIgnore
     private List<Tutorial> tutorial;
 
 }

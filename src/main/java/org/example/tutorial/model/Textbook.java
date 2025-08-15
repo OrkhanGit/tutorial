@@ -23,7 +23,7 @@ public class Textbook {
 
     @ManyToOne
     @JoinColumn(name = "tutorial_id")
-    @JsonBackReference
+//    @JsonBackReference
     @ToString.Exclude
     private Tutorial tutorial;
 

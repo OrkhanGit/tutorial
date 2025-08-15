@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/create-table-tutorial.yaml
+  - include:
+      file: db/changelog/create-table-textbook.yaml
+  - include:
+      file: db/changelog/create-table-tutorialDetails.yaml
+  - include:
+      file: db/changelog/create-table-uploadFileName.yaml

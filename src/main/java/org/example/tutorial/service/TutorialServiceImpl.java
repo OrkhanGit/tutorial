@@ -47,19 +47,41 @@ public class TutorialServiceImpl implements TutorialService {
         }
         tutorial.setPublished(false);
 
+        for(UploadFileName file : tutorial.getUploadFileName()){
+            if(uploadFileNameRepository.findById(file.getId()).isEmpty()){
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("not found upload file");
+            }
+        }
+
         Set<UploadFileName> collect = tutorial.getUploadFileName().stream()
                 .map(file -> entityManager.find(UploadFileName.class, file.getId()))
                 .collect(Collectors.toSet());
-
         tutorial.setUploadFileName(collect);
+
+        if (tutorial.getTutorialDetails() != null) {
+            tutorial.getTutorialDetails().setTutorial(tutorial);
+        }
+
+        if(tutorial.getTextbook() != null){
+            tutorial.getTextbook().forEach(book -> book.setTutorial(tutorial));
+        }
+
         tutorialRepository.save(tutorial);
         return ResponseEntity.status(HttpStatus.CREATED).body("Tutorial created successfully.");
     }
 
+/** asaqida gosterilmish kodda entity-de olmayan filed dto-da var ve yalniz sorqu zamani hemin field gorsenir. db-de olmayacaq. **/
     public ResponseEntity<List<TutorialDto>> getAllTutorialsDto() {
         List<TutorialDto> found = tutorialRepository.findAll()
                 .stream()
-                .map(tutorial -> mapperTutorial.toDto(tutorial))
+                .map(tutorial -> {
+                    TutorialDto dto = mapperTutorial.toDto(tutorial);
+                    dto.setName("Orxan");
+                    if (dto.getPassword() != null) {
+                        dto.setPassword(dto.getPassword().replaceAll(".", "*"));
+                    }
+                    return dto;
+                })
                 .toList();
         return ResponseEntity.ok(found);
     }

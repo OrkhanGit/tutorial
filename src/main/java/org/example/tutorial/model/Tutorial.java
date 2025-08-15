@@ -1,6 +1,7 @@
 package org.example.tutorial.model;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
@@ -10,6 +11,7 @@ import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -38,30 +40,31 @@ public class Tutorial {
     @Column(name = "published")
     private Boolean published;
 
-    @Column(name="createdAt")
+    @Column(name="created_at")
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    @Column(name="updatedAt")
+    @Column(name="updated_at")
     private LocalDateTime updatedAt;
+
+    @Column(name = "password")
+    private String password;
 
     @OneToOne(mappedBy = "tutorial", cascade = CascadeType.ALL,orphanRemoval = true)
     @JsonManagedReference
     private TutorialDetails tutorialDetails;
 
     @OneToMany(mappedBy = "tutorial", cascade = CascadeType.ALL,orphanRemoval = true)
-    @JsonManagedReference
-    @JsonProperty("textBook")
     @ToString.Exclude
-    private Set<Textbook> textbook;
+//    @JsonManagedReference
+    private Set<Textbook> textbook = new HashSet<>();
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "tutorial_upload_file_name",
             joinColumns = @JoinColumn(name = "tutorial_id"),
-            inverseJoinColumns = @JoinColumn(name = "upload_file_name_id")
+            inverseJoinColumns = @JoinColumn(name = "file_name_upload_id")
     )
-    @JsonProperty("uploadFileName")
     @ToString.Exclude
     private Set<UploadFileName> uploadFileName;
 

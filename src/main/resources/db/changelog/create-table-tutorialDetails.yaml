@@ -1,0 +1,35 @@
+databaseChangeLog:
+  - changeSet:
+      author: orkhan
+      id: create_table_tutorial_details
+      context: dev
+      changes:
+        - createTable:
+            schemaName: public
+            tableName: tutorial_details
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: difficulty_level
+                  type: VARCHAR
+              - column:
+                  name: prerequisites
+                  type: VARCHAR
+              - column:
+                  name: tutorial_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    unique: true
+        - addForeignKeyConstraint:
+            baseTableName: tutorial_details
+            baseColumnNames: tutorial_id
+            referencedTableName: tutorial
+            referencedColumnNames: id
+            constraintName: fk_tutorial_details_tutorial
+            onDelete: CASCADE

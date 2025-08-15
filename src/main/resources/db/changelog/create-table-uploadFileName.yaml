@@ -1,0 +1,50 @@
+databaseChangeLog:
+  - changeSet:
+      author: orkhan
+      id: create_table_upload_file_name
+      context: dev
+      changes:
+        - createTable:
+            schemaName: public
+            tableName: upload_file_name
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: file_name
+                  type: VARCHAR
+              - column:
+                  name: upload_time
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+        - createTable:
+            tableName: tutorial_upload_file_name
+            columns:
+              - column:
+                  name: tutorial_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: file_name_upload_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: tutorial_upload_file_name
+            baseColumnNames: tutorial_id
+            referencedTableName: tutorial
+            referencedColumnNames: id
+            constraintName: fk_tutorial_upload_file_name_tutorial
+            onDelete: CASCADE
+        - addForeignKeyConstraint:
+            baseTableName: tutorial_upload_file_name
+            baseColumnNames: file_name_upload_id
+            referencedTableName: upload_file_name
+            referencedColumnNames: id
+            constraintName: fk_tutorial_upload_file_name_upload_file_name
+            onDelete: CASCADE
