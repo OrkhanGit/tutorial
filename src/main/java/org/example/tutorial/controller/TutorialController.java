@@ -1,9 +1,11 @@
 package org.example.tutorial.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.tutorial.dto.TutorialDto;
 import org.example.tutorial.model.Tutorial;
 import org.example.tutorial.service.TutorialService;
+import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,20 +21,14 @@ public class TutorialController {
     private final TutorialService tutorialService;
 
     @PostMapping
-    public ResponseEntity<String> createdTutorial (@RequestBody Tutorial tutorial){
-        return tutorialService.createdTutorial(tutorial);
+    public ResponseEntity<String> createdTutorial (@Valid @RequestBody TutorialDto tutorialDto){
+        return tutorialService.createdTutorial(tutorialDto);
     }
 
     @GetMapping("/all")
     public ResponseEntity<List<TutorialDto>>  getAllTutorialsDto() {
         return tutorialService.getAllTutorialsDto();
     }
-
-//    @GetMapping("/all")
-//    public ResponseEntity<List<Tutorial>>  getAllTutorials() {
-//        return tutorialService.getAllTutorials();
-//    }
-
 
     @GetMapping("/id/{id}")
     public ResponseEntity<Tutorial> getTutorialById(@PathVariable Long id) {
@@ -72,6 +68,11 @@ public class TutorialController {
     @PostMapping("/upload")
     public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
         return tutorialService.uploadFile(file);
+    }
+
+    @GetMapping("/image")
+    public ResponseEntity<Resource> getImage() throws IOException{
+        return tutorialService.getImage();
     }
 
 
