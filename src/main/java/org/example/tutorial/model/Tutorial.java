@@ -56,7 +56,6 @@ public class Tutorial {
 
     @OneToMany(mappedBy = "tutorial", cascade = CascadeType.ALL,orphanRemoval = true)
     @ToString.Exclude
-//    @JsonManagedReference
     private Set<Textbook> textbook = new HashSet<>();
 
     @ManyToMany(cascade = CascadeType.ALL)

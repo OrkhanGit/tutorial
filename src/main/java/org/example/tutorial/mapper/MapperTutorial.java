@@ -8,5 +8,6 @@ import org.mapstruct.Mapper;
 public interface MapperTutorial {
 
     TutorialDto toDto(Tutorial tutorial);
+    Tutorial toEntity(TutorialDto dto);
 
 }

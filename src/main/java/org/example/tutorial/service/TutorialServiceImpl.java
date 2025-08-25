@@ -5,6 +5,7 @@ import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.tutorial.dto.TutorialDto;
+import org.example.tutorial.dto.UploadFileNameDto;
 import org.example.tutorial.exception.NotFound;
 import org.example.tutorial.mapper.MapperTutorial;
 import org.example.tutorial.model.Textbook;
@@ -12,17 +13,24 @@ import org.example.tutorial.model.Tutorial;
 import org.example.tutorial.model.UploadFileName;
 import org.example.tutorial.repository.TutorialRepository;
 import org.example.tutorial.repository.UploadFileNameRepository;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -35,26 +43,35 @@ public class TutorialServiceImpl implements TutorialService {
     private final TutorialRepository tutorialRepository;
     private final UploadFileNameRepository uploadFileNameRepository;
     private final MapperTutorial mapperTutorial;
+    private final MessageSource messageSource;
 
     @PersistenceContext
     private EntityManager entityManager;
 
-    public ResponseEntity<String> createdTutorial(Tutorial tutorial) {
-        String cleanTitle = tutorial.getTitle().replaceAll("\\s+","").toLowerCase();
+    @Override
+    public ResponseEntity<String> createdTutorial(TutorialDto tutorialDto) {
+
+        String cleanTitle = tutorialDto.getTitle().replaceAll("\\s+", "").toLowerCase();
         Optional<Tutorial> found = tutorialRepository.findByTitle(cleanTitle);
         if (found.isPresent()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("\"" + tutorial.getTitle() + "\"" + " already exists");
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body("\"" + tutorialDto.getTitle() + "\"" + " already exists");
         }
+
+        Tutorial tutorial = mapperTutorial.toEntity(tutorialDto);
         tutorial.setPublished(false);
 
-        for(UploadFileName file : tutorial.getUploadFileName()){
-            if(uploadFileNameRepository.findById(file.getId()).isEmpty()){
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("not found upload file");
-            }
+        boolean notFound = uploadFileNameRepository.findAll()
+                .stream()
+                .allMatch(fileDto-> uploadFileNameRepository.findById(fileDto.getId()).isEmpty());
+
+        if(notFound){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("not found upload file");
         }
 
-        Set<UploadFileName> collect = tutorial.getUploadFileName().stream()
-                .map(file -> entityManager.find(UploadFileName.class, file.getId()))
+        Set<UploadFileName> collect = tutorialDto.getUploadFileName().stream()
+                .map(fileDto -> uploadFileNameRepository.findById(fileDto.getId())
+                        .orElseThrow(() -> new NotFound("UploadFile not found")))
                 .collect(Collectors.toSet());
         tutorial.setUploadFileName(collect);
 
@@ -62,24 +79,28 @@ public class TutorialServiceImpl implements TutorialService {
             tutorial.getTutorialDetails().setTutorial(tutorial);
         }
 
-        if(tutorial.getTextbook() != null){
+        if (tutorial.getTextbook() != null) {
             tutorial.getTextbook().forEach(book -> book.setTutorial(tutorial));
         }
 
         tutorialRepository.save(tutorial);
         return ResponseEntity.status(HttpStatus.CREATED).body("Tutorial created successfully.");
+
     }
 
-/** asaqida gosterilmish kodda entity-de olmayan filed dto-da var ve yalniz sorqu zamani hemin field gorsenir. db-de olmayacaq. **/
+    /** asaqida gosterilmish kodda entity-de olmayan filed dto-da var ve yalniz sorqu zamani hemin field gorsenir. db-de olmayacaq. **/
     public ResponseEntity<List<TutorialDto>> getAllTutorialsDto() {
         List<TutorialDto> found = tutorialRepository.findAll()
                 .stream()
                 .map(tutorial -> {
                     TutorialDto dto = mapperTutorial.toDto(tutorial);
-                    dto.setName("Orxan");
                     if (dto.getPassword() != null) {
                         dto.setPassword(dto.getPassword().replaceAll(".", "*"));
                     }
+                    Locale locale = LocaleContextHolder.getLocale();
+                    dto.setPurpose(messageSource.getMessage(
+                            "tutorial.java.purpose", null, locale
+                    ));
                     return dto;
                 })
                 .toList();
@@ -188,4 +209,15 @@ public class TutorialServiceImpl implements TutorialService {
         Files.write(fullPath,file.getBytes());
         return ResponseEntity.status(HttpStatus.OK).body("File uploaded successfully");
     }
+
+    @Override
+    public ResponseEntity<Resource> getImage() throws IOException {
+        Path path = Path.of("upload/PHOTO.jpg").normalize();
+        Resource resource = new UrlResource(path.toUri());
+        String contentType = Files.probeContentType(path);
+        return ResponseEntity.ok()
+                .contentType(contentType != null ? MediaType.parseMediaType(contentType) : MediaType.APPLICATION_OCTET_STREAM)
+                .body(resource);
+    }
+
 }
