@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Tutorial</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            background: url('https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1528&q=80') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .form-container {
+            max-width: 700px;
+            width: 100%;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .page-title {
+            color: #2c3e50;
+            font-weight: 600;
+            margin: 0 0 25px 0;
+            text-align: center;
+            font-size: 28px;
+        }
+
+        .section-title {
+            color: #3498db;
+            font-weight: 600;
+            margin: 30px 0 15px 0;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #eaeaea;
+        }
+
+        .dynamic-section {
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 18px;
+            margin-bottom: 18px;
+            background-color: #f9fafb;
+            position: relative;
+        }
+
+        .btn-remove {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            font-size: 0.8rem;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 0.85em;
+            margin-top: 0.25rem;
+        }
+
+        .is-invalid {
+            border-color: #e74c3c;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            border-radius: 6px;
+            padding: 10px 15px;
+            border: 1px solid #dce1e6;
+        }
+
+        .form-control:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.2);
+        }
+
+        .btn-primary {
+            background-color: #3498db;
+            border: none;
+            padding: 8px 18px;
+            font-size: 0.9rem;
+            border-radius: 6px;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-secondary {
+            background-color: #95a5a6;
+            border: none;
+            padding: 8px 18px;
+            font-size: 0.9rem;
+            border-radius: 6px;
+        }
+
+        .btn-secondary:hover {
+            background-color: #7f8c8d;
+        }
+
+        .password-info {
+            font-size: 0.85rem;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 25px;
+        }
+
+        .input-group-text {
+            background-color: #f8f9fa;
+            border-radius: 0 6px 6px 0;
+        }
+    </style>
+</head>
+<body>
+<div class="form-container">
+    <h1 class="page-title">Create New Tutorial</h1>
+
+    <form th:action="@{/tutorials/create}" th:object="${tutorialWeb}" method="post">
+        <!-- Basic Tutorial Information -->
+        <h4 class="section-title">Basic Information</h4>
+        <div class="row">
+            <div class="col-md-12 mb-3">
+                <label for="title" class="form-label">Title *</label>
+                <input type="text" class="form-control" id="title" th:field="*{title}"
+                       th:classappend="${#fields.hasErrors('title')} ? 'is-invalid'" required>
+                <div class="error-message" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">
+                    Validation error message
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="password" class="form-label">Password *</label>
+            <div class="input-group">
+                <input type="password" class="form-control" id="password" th:field="*{password}"
+                       th:classappend="${#fields.hasErrors('password')} ? 'is-invalid'">
+                <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </div>
+            <div class="error-message" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">
+                Validation error message
+            </div>
+            <div class="password-info">
+                Password minimum 8 simvol olmalı, ən az bir rəqəm və bir böyük hərf içerməlidir
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" th:field="*{description}" rows="3"></textarea>
+        </div>
+
+        <div class="mb-3 form-check form-switch">
+            <input type="checkbox" class="form-check-input" id="published" th:field="*{published}">
+            <label class="form-check-label" for="published">Published</label>
+        </div>
+
+        <!-- Tutorial Details Section -->
+        <h4 class="section-title">Tutorial Details</h4>
+        <div class="dynamic-section">
+            <div class="mb-3">
+                <label for="difficultyLevel" class="form-label">Difficulty Level</label>
+                <select class="form-select" id="difficultyLevel" th:field="*{tutorialDetailsWeb.difficultyLevel}">
+                    <option value="">Select difficulty level</option>
+                    <option value="Beginner">Beginner</option>
+                    <option value="Intermediate">Intermediate</option>
+                    <option value="Advanced">Advanced</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="prerequisites" class="form-label">Prerequisites</label>
+                <textarea class="form-control" id="prerequisites" th:field="*{tutorialDetailsWeb.prerequisites}" rows="2" placeholder="Enter prerequisites separated by commas"></textarea>
+            </div>
+        </div>
+
+        <!-- Textbooks Section -->
+        <h4 class="section-title">Textbooks</h4>
+        <div id="textbooks-container">
+            <div class="dynamic-section textbook-item" th:each="textbook, stat : *{textbookWeb}">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label th:for="|textbook-${stat.index}-book|" class="form-label">Book Title</label>
+                        <input type="text" class="form-control" th:field="*{textbookWeb[__${stat.index}__].book}" th:id="|textbook-${stat.index}-book|">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label th:for="|textbook-${stat.index}-author|" class="form-label">Author</label>
+                        <input type="text" class="form-control" th:field="*{textbookWeb[__${stat.index}__].author}" th:id="|textbook-${stat.index}-author|">
+                    </div>
+                </div>
+                <button type="button" class="btn btn-danger btn-sm btn-remove" onclick="removeTextbook(this)">
+                    <i class="fas fa-trash"></i> Remove
+                </button>
+            </div>
+        </div>
+        <button type="button" class="btn btn-secondary mt-2" id="add-textbook">
+            <i class="fas fa-plus"></i> Add Another Textbook
+        </button>
+
+        <!-- Upload File Names Section -->
+        <h4 class="section-title">Upload Files</h4>
+        <div id="uploadfiles-container">
+            <div class="dynamic-section uploadfile-item" th:each="file, stat : *{uploadFileNameWeb}">
+                <div class="mb-3">
+                    <label th:for="|uploadfile-${stat.index}-filename|" class="form-label">File Name</label>
+                    <input type="text" class="form-control" th:field="*{uploadFileNameWeb[__${stat.index}__].fileName}" th:id="|uploadfile-${stat.index}-filename|">
+                </div>
+                <button type="button" class="btn btn-danger btn-sm btn-remove" onclick="removeUploadFile(this)">
+                    <i class="fas fa-trash"></i> Remove
+                </button>
+            </div>
+        </div>
+        <button type="button" class="btn btn-secondary mt-2" id="add-uploadfile">
+            <i class="fas fa-plus"></i> Add Another File
+        </button>
+
+        <!-- Form Buttons -->
+        <div class="action-buttons">
+            <a href="/index" class="btn btn-secondary">Back</a>
+            <button type="reset" class="btn btn-secondary">Reset</button>
+            <button type="submit" class="btn btn-primary">Create Tutorial</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Textbook dinamik əlavə etmə və silmə
+    document.getElementById('add-textbook').addEventListener('click', function() {
+        const container = document.getElementById('textbooks-container');
+        const index = container.children.length;
+
+        const newItem = document.createElement('div');
+        newItem.className = 'dynamic-section textbook-item';
+        newItem.innerHTML = `
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="textbook-${index}-book" class="form-label">Book Title</label>
+                    <input type="text" class="form-control" id="textbook-${index}-book"
+                           name="textbookWeb[${index}].book">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="textbook-${index}-author" class="form-label">Author</label>
+                    <input type="text" class="form-control" id="textbook-${index}-author"
+                           name="textbookWeb[${index}].author">
+                </div>
+            </div>
+            <button type="button" class="btn btn-danger btn-sm btn-remove" onclick="removeTextbook(this)">
+                <i class="fas fa-trash"></i> Remove
+            </button>
+        `;
+
+        container.appendChild(newItem);
+    });
+
+    function removeTextbook(button) {
+        const item = button.closest('.textbook-item');
+        item.remove();
+
+        // Yenidən nömrələmə
+        const container = document.getElementById('textbooks-container');
+        const items = container.getElementsByClassName('textbook-item');
+
+        for (let i = 0; i < items.length; i++) {
+            const inputs = items[i].getElementsByTagName('input');
+            inputs[0].name = `textbookWeb[${i}].book`;
+            inputs[1].name = `textbookWeb[${i}].author`;
+
+            const labels = items[i].getElementsByTagName('label');
+            labels[0].htmlFor = `textbook-${i}-book`;
+            labels[1].htmlFor = `textbook-${i}-author`;
+
+            inputs[0].id = `textbook-${i}-book`;
+            inputs[1].id = `textbook-${i}-author`;
+        }
+    }
+
+    // Upload File dinamik əlavə etmə və silmə
+    document.getElementById('add-uploadfile').addEventListener('click', function() {
+        const container = document.getElementById('uploadfiles-container');
+        const index = container.children.length;
+
+        const newItem = document.createElement('div');
+        newItem.className = 'dynamic-section uploadfile-item';
+        newItem.innerHTML = `
+            <div class="mb-3">
+                <label for="uploadfile-${index}-filename" class="form-label">File Name</label>
+                <input type="text" class="form-control" id="uploadfile-${index}-filename"
+                       name="uploadFileNameWeb[${index}].fileName">
+            </div>
+            <button type="button" class="btn btn-danger btn-sm btn-remove" onclick="removeUploadFile(this)">
+                <i class="fas fa-trash"></i> Remove
+            </button>
+        `;
+
+        container.appendChild(newItem);
+    });
+
+    function removeUploadFile(button) {
+        const item = button.closest('.uploadfile-item');
+        item.remove();
+
+        // Yenidən nömrələmə
+        const container = document.getElementById('uploadfiles-container');
+        const items = container.getElementsByClassName('uploadfile-item');
+
+        for (let i = 0; i < items.length; i++) {
+            const input = items[i].getElementsByTagName('input')[0];
+            input.name = `uploadFileNameWeb[${i}].fileName`;
+
+            const label = items[i].getElementsByTagName('label')[0];
+            label.htmlFor = `uploadfile-${i}-filename`;
+
+            input.id = `uploadfile-${i}-filename`;
+        }
+    }
+
+    const togglePassword = document.getElementById('togglePassword');
+    const password = document.getElementById('password');
+
+    togglePassword.addEventListener('click', function () {
+        const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+        password.setAttribute('type', type);
+        this.querySelector('i').classList.toggle('fa-eye');
+        this.querySelector('i').classList.toggle('fa-eye-slash');
+    });
+</script>
+</body>
+</html>

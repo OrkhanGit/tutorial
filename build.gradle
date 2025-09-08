@@ -34,6 +34,8 @@ dependencies {
     implementation 'net.logstash.logback:logstash-logback-encoder:8.1' // for convert to JSON
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0' // for SWAGGER
     implementation("io.minio:minio:8.5.17") //minIO
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
     implementation 'org.mapstruct:mapstruct:1.5.3.Final'
     implementation("org.springframework.boot:spring-boot-starter-validation")
     runtimeOnly 'org.postgresql:postgresql'

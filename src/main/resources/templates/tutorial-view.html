@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Tutorial Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: url('/images/background.png') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            width: 40%;
+            margin: 40px auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            border: 1px solid #e0e0e0;
+        }
+        .title-frame {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            border: 1px solid #dee2e6;
+        }
+        h2 {
+            margin: 0;
+            color: #2c3e50;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            vertical-align: top;
+            border-bottom: 1px solid #dee2e6;
+        }
+        th {
+            width: 20%;
+            text-align: center;
+            background-color: #f8f9fa;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+        td {
+            width: 80%;
+            color: #495057;
+        }
+        .detail-item {
+            margin-bottom: 8px;
+        }
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 8px 16px;
+            background-color: #2c3e50;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        .back-btn:hover {
+            background-color: #1a252f;
+            color: white;
+            text-decoration: none;
+        }
+        .update-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 8px 16px;
+            background-color: #28a745;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        .update-btn:hover {
+            background-color: #218838;
+            color: white;
+            text-decoration: none;
+        }
+        p {
+            color: #6c757d;
+            margin: 0;
+            font-style: italic;
+        }
+        strong {
+            color: #2c3e50;
+        }
+        .icon {
+            margin-right: 8px;
+            color: #2c3e50;
+        }
+        .textbook-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .textbook-field {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="title-frame">
+        <h2 th:text="${tutorialWeb.title}">Tutorial Title</h2>
+    </div>
+
+    <table>
+        <!-- Description -->
+        <tr>
+            <th><i class="fas fa-align-left icon"></i>Description</th>
+            <td>
+                <div th:if="${tutorialWeb.description != null and tutorialWeb.description != ''}">
+                    <span th:text="${tutorialWeb.description}"></span>
+                </div>
+                <div th:if="${tutorialWeb.description == null or tutorialWeb.description == ''}">
+                    <p>No description available.</p>
+                </div>
+            </td>
+        </tr>
+
+        <!-- Published -->
+        <tr>
+            <th><i class="fas fa-check-circle icon"></i>Published</th>
+            <td>
+                <span th:if="${tutorialWeb.published == true}" style="color: green;">
+                    <i class="fas fa-check"></i> Yes
+                </span>
+                <span th:if="${tutorialWeb.published == false}" style="color: red;">
+                    <i class="fas fa-times"></i> No
+                </span>
+            </td>
+        </tr>
+
+        <!-- Tutorial Details -->
+        <tr>
+            <th><i class="fas fa-info-circle icon"></i>Tutorial Details</th>
+            <td>
+                <div th:if="${tutorialWeb.tutorialDetailsWeb != null}">
+                    <div class="detail-item">
+                        <strong>Difficulty Level:</strong>
+                        <span th:text="${tutorialWeb.tutorialDetailsWeb.difficultyLevel} ?: 'Not specified'"></span>
+                    </div>
+                    <div class="detail-item">
+                        <strong>Prerequisites:</strong>
+                        <span th:text="${tutorialWeb.tutorialDetailsWeb.prerequisites} ?: 'Not specified'"></span>
+                    </div>
+                </div>
+                <div th:if="${tutorialWeb.tutorialDetailsWeb == null}">
+                    <p>No details available.</p>
+                </div>
+            </td>
+        </tr>
+
+        <!-- UploadFile Name (ManyToMany) -->
+        <tr>
+            <th><i class="fas fa-file-upload icon"></i>Uploaded Files</th>
+            <td>
+                <div th:if="${tutorialWeb.uploadFileNameWeb != null and !tutorialWeb.uploadFileNameWeb.isEmpty()}">
+                    <div class="detail-item" th:each="file : ${tutorialWeb.uploadFileNameWeb}">
+                        <i class="fas fa-file"></i> <span th:text="${file.fileName}"></span>
+                    </div>
+                </div>
+                <div th:if="${tutorialWeb.uploadFileNameWeb == null or tutorialWeb.uploadFileNameWeb.isEmpty()}">
+                    <p>No files available.</p>
+                </div>
+            </td>
+        </tr>
+
+        <!-- Textbook (OneToMany) -->
+        <tr>
+            <th><i class="fas fa-book icon"></i>Textbooks</th>
+            <td>
+                <div th:if="${tutorialWeb.textbookWeb != null and !tutorialWeb.textbookWeb.isEmpty()}">
+                    <div class="detail-item textbook-info" th:each="book, iterStat : ${tutorialWeb.textbookWeb}">
+                        <div class="textbook-field">
+                            <strong>Book:</strong>
+                            <span th:text="${book.book} ?: 'Not specified'"></span>
+                        </div>
+                        <div class="textbook-field">
+                            <strong>Author:</strong>
+                            <span th:text="${book.author} ?: 'Not specified'"></span>
+                        </div>
+                    </div>
+                </div>
+                <div th:if="${tutorialWeb.textbookWeb == null or tutorialWeb.textbookWeb.isEmpty()}">
+                    <p>No textbook available.</p>
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <div class="button-container">
+        <a th:href="@{/index}" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Back to List
+        </a>
+        <a th:href="@{'/tutorials/update/' + ${tutorialWeb.id}}" class="update-btn">
+            <i class="fas fa-edit"></i> Update
+        </a>
+    </div>
+</div>
+</body>
+</html>
