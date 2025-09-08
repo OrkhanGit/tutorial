@@ -1,9 +1,6 @@
-package org.example.tutorial.model;
+package org.example.tutorial.thymeleaf.model;
 
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -11,27 +8,16 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+
 
 @Entity
 @Getter
 @Setter
-@Table(name = "tutorial")
-//@NamedEntityGraph(name = "tutorialWithAll",
-//attributeNodes = {
-//        @NamedAttributeNode("tutorialDetails"),
-//        @NamedAttributeNode("textbook"),
-//        @NamedAttributeNode("uploadFileName")
-//})
-public class Tutorial {
-
+@Table(name = "tutorialWeb")
+public class TutorialWeb {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -61,21 +47,20 @@ public class Tutorial {
             message = "Must be at least 8 characters long, with at least one number and one uppercase letter.")
     private String password;
 
-    @OneToOne(mappedBy = "tutorial", cascade = CascadeType.ALL,orphanRemoval = true)
+    @OneToOne(mappedBy = "tutorialWeb", cascade = CascadeType.ALL,orphanRemoval = true)
     @JsonManagedReference
-    private TutorialDetails tutorialDetails;
+    private TutorialDetailsWeb tutorialDetailsWeb;
 
-    @OneToMany(mappedBy = "tutorial", cascade = CascadeType.ALL,orphanRemoval = true)
+    @OneToMany(mappedBy = "tutorialWeb", cascade = CascadeType.ALL,orphanRemoval = true)
     @ToString.Exclude
-    private Set<Textbook> textbook = new HashSet<>();
+    private List<TextbookWeb> textbookWeb = new ArrayList<>();
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
-            name = "tutorial_upload_file_name",
-            joinColumns = @JoinColumn(name = "tutorial_id"),
-            inverseJoinColumns = @JoinColumn(name = "file_name_upload_id")
+            name = "tutorial_upload_file_name_web",
+            joinColumns = @JoinColumn(name = "tutorial_web_id"),
+            inverseJoinColumns = @JoinColumn(name = "file_name_upload_web_id")
     )
     @ToString.Exclude
-    private Set<UploadFileName> uploadFileName;
-
+    private List<UploadFileNameWeb> uploadFileNameWeb = new ArrayList<>();
 }

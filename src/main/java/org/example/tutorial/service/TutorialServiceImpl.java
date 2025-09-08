@@ -5,7 +5,6 @@ import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.tutorial.dto.TutorialDto;
-import org.example.tutorial.dto.UploadFileNameDto;
 import org.example.tutorial.exception.NotFound;
 import org.example.tutorial.mapper.MapperTutorial;
 import org.example.tutorial.model.Textbook;
@@ -24,7 +23,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;

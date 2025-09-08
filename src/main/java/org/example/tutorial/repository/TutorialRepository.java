@@ -17,8 +17,9 @@ public interface TutorialRepository extends JpaRepository<Tutorial, Long> {
     List<Tutorial> findByPublished(boolean published);
     Optional<Tutorial> findByTitleAndIdNot(String title, Long id);
 
-    @EntityGraph(value = "tutorialWithAll")
-    List<Tutorial> findAll();
+
+//    @EntityGraph(value = "tutorialWithAll")
+//    List<Tutorial> findAll();
 
     /**
      * bunuda istifade elemek olar EntityGraph kimi. bu method seviyyesindedir.
