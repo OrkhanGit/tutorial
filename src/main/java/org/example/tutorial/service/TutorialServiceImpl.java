@@ -4,8 +4,10 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.tutorial.dto.PriceDto;
 import org.example.tutorial.dto.TutorialDto;
 import org.example.tutorial.exception.NotFound;
+import org.example.tutorial.feign.Price;
 import org.example.tutorial.mapper.MapperTutorial;
 import org.example.tutorial.model.Textbook;
 import org.example.tutorial.model.Tutorial;
@@ -36,15 +38,22 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class TutorialServiceImpl implements TutorialService {
+public class TutorialServiceImpl implements TutorialService  {
 
     private final TutorialRepository tutorialRepository;
     private final UploadFileNameRepository uploadFileNameRepository;
     private final MapperTutorial mapperTutorial;
     private final MessageSource messageSource;
+    private final Price price;
 
     @PersistenceContext
     private EntityManager entityManager;
+
+    @Override
+    public Optional<PriceDto> getPriceData(long id) {
+        return price.getPrice(id);
+    }
+
 
     @Override
     public ResponseEntity<String> createdTutorial(TutorialDto tutorialDto) {
@@ -217,5 +226,7 @@ public class TutorialServiceImpl implements TutorialService {
                 .contentType(contentType != null ? MediaType.parseMediaType(contentType) : MediaType.APPLICATION_OCTET_STREAM)
                 .body(resource);
     }
+
+
 
 }
