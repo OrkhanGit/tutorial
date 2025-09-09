@@ -2,7 +2,9 @@ package org.example.tutorial.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.example.tutorial.dto.PriceDto;
 import org.example.tutorial.dto.TutorialDto;
+import org.example.tutorial.feign.Price;
 import org.example.tutorial.model.Tutorial;
 import org.example.tutorial.service.TutorialService;
 import org.springframework.core.io.Resource;
@@ -12,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/tutorial")
@@ -19,6 +22,11 @@ import java.util.List;
 public class TutorialController {
 
     private final TutorialService tutorialService;
+
+    @GetMapping("/price/{id}")
+    public Optional<PriceDto> getPriceData(@PathVariable Long id){
+        return tutorialService.getPriceData(id);
+    }
 
     @PostMapping
     public ResponseEntity<String> createdTutorial (@Valid @RequestBody TutorialDto tutorialDto){
