@@ -5,7 +5,10 @@ import lombok.RequiredArgsConstructor;
 import org.example.tutorial.thymeleaf.model.TextbookWeb;
 import org.example.tutorial.thymeleaf.model.TutorialWeb;
 import org.example.tutorial.thymeleaf.model.UploadFileNameWeb;
+import org.example.tutorial.thymeleaf.model.UsersWeb;
 import org.example.tutorial.thymeleaf.service.ServiceTutorial;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -96,6 +99,31 @@ public class ControllerTutorial {
         }
     }
 
+    @GetMapping("/register")
+    public String registerPage(Model model) {
+        model.addAttribute("usersWeb", new UsersWeb());
+        return "register";
+    }
+
+    @PostMapping("/register")
+    public String createUser(@Valid @ModelAttribute("usersWeb") UsersWeb usersWeb,
+                             RedirectAttributes redirectAttributes) {
+        try{
+        ResponseEntity<String> response = serviceTutorial.createUser(usersWeb);
+
+        if (response.getStatusCode().is2xxSuccessful()) {
+            redirectAttributes.addFlashAttribute("successMessage", "Account created successfully!");
+            return "redirect:/main"; // login səhifəsinə yönləndir
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", response.getBody());
+            return "redirect:/register";
+        }
+        }catch (DataIntegrityViolationException e) {
+            // Email təkrar olduqda buraya düşəcək
+            redirectAttributes.addFlashAttribute("errorMessage", "Bu e-mail artıq mövcuddur!");
+            return "redirect:/register";
+        }
+    }
 
 
 

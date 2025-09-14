@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <title>Qeydiyyat | Tutorial Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: url('/images/background.png') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .register-container {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            width: 100%;
+            max-width: 420px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .register-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .register-header h1 {
+            color: #fff;
+            font-weight: 700;
+            margin-bottom: 0;
+            font-size: 1.8rem;
+            line-height: 1.2;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        .register-header .system-text {
+            display: block;
+            font-size: 1.8rem;
+            color: #fff;
+            font-weight: 700;
+            margin-top: 2px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        .form-control {
+            border-radius: 6px;
+            padding: 10px 40px 10px 12px;
+            font-size: 14px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s;
+            height: 42px;
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        .form-control:focus {
+            border-color: #2a5298;
+            box-shadow: 0 0 0 0.2rem rgba(42, 82, 152, 0.25);
+            background-color: #fff;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .input-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            font-size: 1em;
+            z-index: 5;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            height: 20px;
+            width: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-register {
+            width: 100%;
+            padding: 10px;
+            font-size: 1em;
+            border-radius: 6px;
+            background-color: #2a5298;
+            border: none;
+            transition: all 0.3s;
+            height: 42px;
+            color: white;
+            font-weight: 600;
+        }
+
+        .btn-register:hover {
+            background-color: #1e3c72;
+            transform: translateY(-1px);
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 6px;
+            font-size: 0.95em;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .text-decoration-none {
+            color: rgba(255, 255, 255, 0.9) !important;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .text-decoration-none:hover {
+            color: #fff !important;
+        }
+
+        .gender-options {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 16px;
+        }
+
+        .gender-option {
+            flex: 1;
+            text-align: center;
+        }
+
+        .gender-option input[type="radio"] {
+            display: none;
+        }
+
+        .gender-option label {
+            display: block;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .gender-option input[type="radio"]:checked + label {
+            background-color: #2a5298;
+            font-weight: bold;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.95em;
+        }
+
+        .btn-login {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 8px 20px;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-login:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Xüsusi modal üçün stil */
+        .custom-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 350px;
+            width: 100%;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-title {
+            color: #2a5298;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .modal-icon {
+            font-size: 48px;
+            color: #28a745;
+            margin-bottom: 15px;
+        }
+
+        .modal-button {
+            background-color: #2a5298;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .modal-button:hover {
+            background-color: #1e3c72;
+        }
+
+        /* Xəta mesajları üçün stil */
+        .error-message {
+            color: #ff6b6b;
+            font-size: 0.85rem;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .is-invalid {
+            border-color: #ff6b6b !important;
+        }
+    </style>
+</head>
+<body>
+<div class="register-container">
+    <div class="register-header">
+        <h1>Create<br><span class="system-text">Tutorial</span></h1>
+    </div>
+
+    <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+        <span th:text="${errorMessage}"></span>
+    </div>
+
+    <div th:if="${successMessage}" class="alert alert-success" role="alert">
+        <span th:text="${successMessage}"></span>
+    </div>
+
+    <form id="registerForm" th:action="@{/register}" th:object="${usersWeb}" method="post">
+        <div class="mb-3">
+            <label for="username" class="form-label">Username</label>
+            <input type="text" class="form-control" id="username" th:field="*{username}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="email" class="form-label">E-mail</label>
+            <input type="email" class="form-control" id="email" th:field="*{email}" required>
+            <div id="emailError" class="error-message">Bu e-mail artıq qeydiyyatdan keçmişdir.</div>
+        </div>
+
+        <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <div class="input-group">
+                <input type="password" class="form-control" id="password" th:field="*{password}" required>
+                <button type="button" class="input-icon" id="togglePassword">
+                    <i class="fa fa-eye"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Gender</label>
+            <div class="gender-options">
+                <div class="gender-option">
+                    <input type="radio" id="male" th:field="*{gender}" value="male" required>
+                    <label for="male">Male</label>
+                </div>
+                <div class="gender-option">
+                    <input type="radio" id="female" th:field="*{gender}" value="female">
+                    <label for="female">Female</label>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-register mt-2">Create</button>
+        <button type="button" class="btn btn-secondary mt-2 w-100" onclick="window.location.href='/main'">Back</button>
+    </form>
+</div>
+
+<!-- Xüsusi uğur mesajı modalı -->
+<div id="successModal" class="custom-modal">
+    <div class="modal-content">
+        <div class="modal-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <h3 class="modal-title">Qeydiyyat Uğurla Tamamlandı!</h3>
+        <p>Hesabınız uğurla yaradıldı. İndi sistemə daxil ola bilərsiniz.</p>
+        <button class="modal-button" id="modalOkButton">Tamam</button>
+    </div>
+</div>
+
+<script>
+    // Parolun göstərilməsi/gizlənməsi funksionallığı
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('password');
+    const passwordIcon = togglePassword.querySelector('i');
+
+    togglePassword.addEventListener('click', function () {
+        if(passwordInput.type === "password") {
+            passwordInput.type = "text";
+            passwordIcon.classList.remove('fa-eye');
+            passwordIcon.classList.add('fa-eye-slash');
+        } else {
+            passwordInput.type = "password";
+            passwordIcon.classList.remove('fa-eye-slash');
+            passwordIcon.classList.add('fa-eye');
+        }
+    });
+
+    // Modal düyməsinə klikləndikdə
+    document.getElementById('modalOkButton').addEventListener('click', function() {
+        // Main səhifəsinə yönləndir
+        window.location.href = '/main';
+    });
+
+    // E-mail yoxlama funksiyası
+    function checkEmailExists(email) {
+        // Burada server tərəfdən e-mail-in mövcud olub-olmadığını yoxlayan API çağırışı etməlisiniz
+        // Bu sadəcə nümunədir, real tətbiqdə server tərəfində yoxlanılmalıdır
+
+        // Nümunə məlumatlar (əslində bu serverdən gəlməlidir)
+        const existingEmails = ['test@example.com', 'user@domain.com', 'existing@email.com'];
+
+        // E-mail-in mövcud olub-olmadığını yoxlayırıq
+        return existingEmails.includes(email);
+    }
+
+    // Form göndərilməsinin idarə edilməsi
+    document.getElementById('registerForm').addEventListener('submit', function(event) {
+        const emailInput = document.getElementById('email');
+        const emailError = document.getElementById('emailError');
+
+        // E-mail yoxlanışı
+        if (checkEmailExists(emailInput.value)) {
+            // E-mail artıq mövcuddursa, formun göndərilməsinin qarşısını al
+            event.preventDefault();
+
+            // Xəta mesajını göstər
+            emailError.style.display = 'block';
+            emailInput.classList.add('is-invalid');
+        } else {
+            // E-mail yoxdursa, xəta mesajını gizlət
+            emailError.style.display = 'none';
+            emailInput.classList.remove('is-invalid');
+
+            // Form məlumatlarını serverə göndər
+            console.log('Qeydiyyat məlumatları:', {
+                username: document.getElementById('username').value,
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value,
+                gender: document.querySelector('input[name="gender"]:checked')?.value
+            });
+        }
+    });
+
+    // E-mail inputu dəyişdikdə xəta mesajını gizlət
+    document.getElementById('email').addEventListener('input', function() {
+        document.getElementById('emailError').style.display = 'none';
+        this.classList.remove('is-invalid');
+    });
+</script>
+</body>
+</html>
