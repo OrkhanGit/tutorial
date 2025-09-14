@@ -14,6 +14,7 @@ import org.example.tutorial.model.Tutorial;
 import org.example.tutorial.model.UploadFileName;
 import org.example.tutorial.repository.TutorialRepository;
 import org.example.tutorial.repository.UploadFileNameRepository;
+import org.example.tutorial.security.repository.UserRepository;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.io.Resource;
@@ -22,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -38,6 +40,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional
 public class TutorialServiceImpl implements TutorialService  {
 
     private final TutorialRepository tutorialRepository;
@@ -45,6 +48,7 @@ public class TutorialServiceImpl implements TutorialService  {
     private final MapperTutorial mapperTutorial;
     private final MessageSource messageSource;
     private final Price price;
+    private final UserRepository userRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -226,7 +230,6 @@ public class TutorialServiceImpl implements TutorialService  {
                 .contentType(contentType != null ? MediaType.parseMediaType(contentType) : MediaType.APPLICATION_OCTET_STREAM)
                 .body(resource);
     }
-
 
 
 }

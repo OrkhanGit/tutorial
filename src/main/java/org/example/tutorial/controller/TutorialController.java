@@ -4,11 +4,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.tutorial.dto.PriceDto;
 import org.example.tutorial.dto.TutorialDto;
-import org.example.tutorial.feign.Price;
 import org.example.tutorial.model.Tutorial;
+import org.example.tutorial.security.repository.UserRepository;
 import org.example.tutorial.service.TutorialService;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,6 +23,8 @@ import java.util.Optional;
 public class TutorialController {
 
     private final TutorialService tutorialService;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @GetMapping("/price/{id}")
     public Optional<PriceDto> getPriceData(@PathVariable Long id){
